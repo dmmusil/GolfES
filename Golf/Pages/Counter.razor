@@ -1,0 +1,44 @@
+﻿@page "/counter"
+@using Golf.Data
+@inject IRoundViewModel RoundViewModel
+
+<h1>Counter</h1>
+@if (RoundViewModel.Round == null)
+{
+    <select @bind="RoundViewModel.SelectedCourse">
+        <option value="@Guid.Empty">Choose a course</option>
+        @foreach (var (name, id) in Course.Courses)
+        {
+            <option value="@id">@name</option>
+        }
+    </select>
+    <button @onclick="RoundViewModel.CreateRound">New round</button>
+}
+
+@if (RoundViewModel.Round != null)
+{
+    <div>
+        @RoundViewModel.SelectedCourseName
+    </div>
+    <button @onclick="RoundViewModel.SelectGolfer">
+        Add player
+    </button>
+    
+    <table>
+        <tr>
+            <td>Golfer</td>
+            <td>Hole</td>
+            <td>Score</td>
+        </tr>
+        @foreach (var ((golfer, hole), score) in RoundViewModel.Round.State.Scores)
+        {
+            <tr>
+                <td>@golfer</td>
+                <td>@hole</td>
+                <td>@score</td>
+            </tr>
+        }
+    </table>
+}
+
+
