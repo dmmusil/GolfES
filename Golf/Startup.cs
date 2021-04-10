@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Eventuous;
+using Eventuous.Tests.Fakes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Golf.Data;
+using Golf.Data.Eventuous;
 
 namespace Golf
 {
@@ -29,8 +32,13 @@ namespace Golf
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IEventStore, InMemoryEventStore>();
+            services.AddSingleton(_ => DefaultEventSerializer.Instance);
+            services.AddSingleton<IAggregateStore, AggregateStore>();
             services.AddSingleton<IRoundViewModel, RoundViewModel>();
+            services.AddSingleton<RoundService>();
+            
+            RoundEvents.Register();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

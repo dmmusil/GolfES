@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Golf.Data.Eventuous;
 using ValueOf;
 
 namespace Golf.Data
@@ -97,14 +98,14 @@ namespace Golf.Data
 
     public class RoundViewModel : IRoundViewModel
     {
-        private readonly IRepository _repository;
-        private Round _state;
-        public Round Round => _state;
+        private readonly RoundService _svc;
+        private GolfRoundState _state;
+        public GolfRoundState Round => _state;
         public string SelectedCourse { get; set; }
-        private readonly string roundId = "the-round";
-        public RoundViewModel(IRepository repository)
+        private readonly RoundId _roundId = new RoundId("the-round");
+        public RoundViewModel(RoundService svc)
         {
-            _repository = repository;
+            _svc = svc;
         }
 
         public string SelectedCourseName => string.IsNullOrWhiteSpace(SelectedCourse)
@@ -112,20 +113,22 @@ namespace Golf.Data
             : Course.Courses.First(c => c.Id.ToString() == SelectedCourse).Name;
         public async Task CreateRound()
         {
-            _state = await _repository.Dispatch<Round, SelectCourse>(new SelectCourse(roundId,
+            var result = await _svc.Handle(new SelectCourse(_roundId,
                 CourseId.From(Guid.Parse(SelectedCourse))));
+            _state = result.State;
         }
 
         public async Task SelectGolfer()
         {
-            _state = await _repository.Dispatch<Round, SelectGolfer>(new SelectGolfer(roundId,
+            var result = await _svc.Handle(new SelectGolfer(_roundId,
                 GolferId.From(Guid.NewGuid()), true));
+            _state = result.State;
         }
     }
 
     public interface IRoundViewModel
     {
-        Round Round { get; }
+        GolfRoundState Round { get; }
         string SelectedCourse { get; set; }
         string SelectedCourseName { get; }
         Task CreateRound();
@@ -194,33 +197,38 @@ namespace Golf.Data
 
         public IEnumerable<Event> When(SelectGolfer selectGolfer)
         {
-            var (_, golferId, generateScores) = selectGolfer;
+            var (roundId, golferId, generateScores) = selectGolfer;
             if (State.GolferIds.Contains(golferId))
             {
                 yield break;
             }
 
-            yield return new GolferSelected(GolferId.From(golferId));
+            yield return new GolferSelected(roundId, GolferId.From(golferId));
             if (!generateScores) yield break;
             for (int i = 0; i < 9; i++)
             {
-                yield return new HoleScoreSubmitted(golferId, i + 1, new Random().Next(2, 8));
+                yield return new HoleScoreSubmitted(roundId, golferId, i + 1, new Random().Next(2, 8));
             }
         }
 
         public IEnumerable<Event> When(SubmitHoleScore submitHoleScore)
         {
-            var (_, holeScore, golferId) = submitHoleScore;
+            var (roundId, holeScore, golferId) = submitHoleScore;
             yield return new HoleScoreSubmitted(
+                roundId,
                 golferId,
                 holeScore.Value.Hole,
                 holeScore.Value.Score);
         }
     }
 
-    public record HoleScoreSubmitted(Guid GolferId, int HoleNumber, int Strokes) : Event;
+    public record HoleScoreSubmitted(
+        string RoundId, 
+        Guid GolferId, 
+        int HoleNumber, 
+        int Strokes) : Event;
 
-    public record GolferSelected(Guid GolferId) : Event;
+    public record GolferSelected(string RoundId, Guid GolferId) : Event;
 
     public abstract class Aggregate
     {
@@ -239,7 +247,7 @@ namespace Golf.Data
         public abstract string Id { get; protected set; }
     }
 
-    public record SelectCourse(string RoundId, CourseId CourseId) : Command(RoundId);
+    public record SelectCourse(RoundId RoundId, CourseId CourseId) : Command(RoundId);
 
     public record CourseSelected(string RoundId, Guid CourseId) : Event;
 
@@ -268,7 +276,7 @@ namespace Golf.Data
         }
     }
 
-    public record SubmitHoleScore(string RoundId, HoleScore Score, GolferId GolferId) : Command(RoundId);
+    public record SubmitHoleScore(RoundId RoundId, HoleScore Score, GolferId GolferId) : Command(RoundId);
 
-    public record SelectGolfer(string RoundId, GolferId GolferId, bool GenerateScores) : Command(RoundId);
+    public record SelectGolfer(RoundId RoundId, GolferId GolferId, bool GenerateScores) : Command(RoundId);
 }

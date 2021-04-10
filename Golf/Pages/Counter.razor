@@ -30,7 +30,7 @@
             <td>Hole</td>
             <td>Score</td>
         </tr>
-        @foreach (var ((golfer, hole), score) in RoundViewModel.Round.State.Scores)
+        @foreach (var ((golfer, hole), score) in RoundViewModel.Round.Scores)
         {
             <tr>
                 <td>@golfer</td>

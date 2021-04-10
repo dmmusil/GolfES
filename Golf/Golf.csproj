@@ -8,4 +8,9 @@
       <PackageReference Include="ValueOf" Version="1.0.17" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\eventuous\src\Eventuous\Eventuous.csproj" />
+      <ProjectReference Include="..\..\eventuous\test\Eventuous.Tests\Eventuous.Tests.csproj" />
+    </ItemGroup>
+
 </Project>
