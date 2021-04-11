@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Eventuous;
 
 namespace Golf.Data.Eventuous
@@ -69,30 +69,29 @@ namespace Golf.Data.Eventuous
         {
             return @event switch
             {
-                CourseSelected c => this with {Id = new RoundId(c.RoundId), CourseId = c.CourseId, RoundId = c.RoundId},
-                GolferSelected g => GolferSelected(this, g),
-                HoleScoreSubmitted h => HoleScoreSubmitted(this, h),
-                _ => throw new ArgumentOutOfRangeException(nameof(@event), "Unknown event")
+                CourseSelected c => this with
+                {
+                    Id = new RoundId(c.RoundId), 
+                    CourseId = c.CourseId, 
+                    RoundId = c.RoundId
+                },
+                GolferSelected g => this with
+                {
+                    GolferIds = GolferIds.Add(g.GolferId)
+                },
+                HoleScoreSubmitted h => this with
+                {
+                    Scores = Scores.Add((h.GolferId, h.HoleNumber), h.Strokes)
+                },
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(@event), 
+                    "Unknown event")
             };
+       }
 
-            static GolfRoundState GolferSelected(GolfRoundState state, GolferSelected g)
-            {
-                var golfers = state.GolferIds;
-                golfers.Add(g.GolferId);
-                return state with {GolferIds = golfers};
-            }
+        public ImmutableDictionary<(Guid golfer, int hole), int> Scores { get; init; } = ImmutableDictionary<(Guid golfer, int hole), int>.Empty;
 
-            static GolfRoundState HoleScoreSubmitted(GolfRoundState state, HoleScoreSubmitted h)
-            {
-                var holes = state.Scores;
-                holes.Add((h.GolferId, h.HoleNumber), h.Strokes);
-                return state with {Scores = holes};
-            }
-        }
-
-        public Dictionary<(Guid golfer, int hole), int> Scores { get; init; } = new();
-
-        public HashSet<Guid> GolferIds { get; init; } = new();
+        public ImmutableHashSet<Guid> GolferIds { get; init; } = ImmutableHashSet<Guid>.Empty;
 
         public Guid CourseId { get; init; }
 

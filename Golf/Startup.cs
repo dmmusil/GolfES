@@ -1,18 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Eventuous;
-using Eventuous.Tests.Fakes;
+using Eventuous.Json;
+using Eventuous.SqlStreamStore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Golf.Data;
 using Golf.Data.Eventuous;
+using SqlStreamStore;
+using SqlStreamStore.Infrastructure;
 
 namespace Golf
 {
@@ -32,9 +29,10 @@ namespace Golf
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<IEventStore, InMemoryEventStore>();
-            services.AddSingleton(_ => DefaultEventSerializer.Instance);
-            services.AddSingleton<IAggregateStore, AggregateStore>();
+            services.AddSingleton<StreamStoreBase, InMemoryStreamStore>();
+            services.AddSingleton<IJsonEventStore, SssEventStore>();
+            services.AddSingleton(_ => JsonEventSerializer.Instance);
+            services.AddSingleton<IAggregateStore, JsonAggregateStore>();
             services.AddSingleton<IRoundViewModel, RoundViewModel>();
             services.AddSingleton<RoundService>();
             
