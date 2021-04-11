@@ -2,13 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Golf.Data;
+using Golf.Data.Eventuous;
 using Xunit;
 
 namespace Golf.Tests
 {
     public class UnitTest1
     {
-        private const string RoundId = "the-round";
+        private readonly RoundId RoundId = new("the-round");
 
         [Fact]
         public void Select_course()
@@ -58,7 +59,7 @@ namespace Golf.Tests
             var round = new Round();
             var then = round.When(submitHoleScore).ToList();
             Assert.Single(then);
-            var (golfer, holeNumber, strokes) = (HoleScoreSubmitted) then[0];
+            var (_, golfer, holeNumber, strokes) = (HoleScoreSubmitted) then[0];
             Assert.Equal(holeScore.Value.Hole, holeNumber);
             Assert.Equal(holeScore.Value.Score, strokes);
             Assert.Equal(golferId, golfer);
