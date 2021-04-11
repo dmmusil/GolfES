@@ -13,16 +13,20 @@ namespace Golf.Data.Eventuous
             TypeMap.AddType<HoleScoreSubmitted>(nameof(HoleScoreSubmitted));
         }
     }
+
     public class RoundService : ApplicationService<GolfRound, GolfRoundState, RoundId>
     {
         public RoundService(IAggregateStore store) : base(store)
         {
-            OnNew<SelectCourse>((round, select) =>
-                round.SelectCourse(select.RoundId, select.CourseId));
+            OnAny<SelectCourse>(
+                cmd => cmd.RoundId,
+                (round, select) => round.SelectCourse(select.RoundId, select.CourseId));
+
             OnExisting<SelectGolfer>(
                 select => select.RoundId,
                 (round, golfer) => round.SelectGolfer(golfer.RoundId, golfer.GolferId, true)
             );
+
             OnExisting<SubmitHoleScore>(
                 cmd => cmd.RoundId,
                 (round, hole) => round.SubmitHoleScore(hole.RoundId, hole.Score, hole.GolferId)
@@ -34,7 +38,6 @@ namespace Golf.Data.Eventuous
     {
         public void SelectCourse(RoundId roundId, CourseId courseId)
         {
-            EnsureDoesntExist();
             Apply(new CourseSelected(roundId, courseId));
         }
 
