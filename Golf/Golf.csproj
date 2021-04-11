@@ -9,9 +9,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\eventuous\src\Eventuous.Json\Eventuous.Json.csproj" />
-      <ProjectReference Include="..\..\eventuous\src\Eventuous.SqlStreamStore\Eventuous.SqlStreamStore.csproj" />
-      <ProjectReference Include="..\..\eventuous\src\Eventuous\Eventuous.csproj" />
+      <ProjectReference Include="..\eventuous\src\Eventuous.Json\Eventuous.Json.csproj" />
+      <ProjectReference Include="..\eventuous\src\Eventuous.SqlStreamStore\Eventuous.SqlStreamStore.csproj" />
+      <ProjectReference Include="..\eventuous\src\Eventuous\Eventuous.csproj" />
     </ItemGroup>
 
 </Project>
