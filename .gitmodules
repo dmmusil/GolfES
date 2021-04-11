@@ -1,0 +1,3 @@
+[submodule "eventuous"]
+	path = eventuous
+	url = git@github.com:dmmusil/eventuous.git
