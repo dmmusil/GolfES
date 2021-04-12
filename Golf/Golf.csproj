@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="SqlStreamStore.MsSql" Version="1.2.0" />
       <PackageReference Include="ValueOf" Version="1.0.17" />
     </ItemGroup>
 

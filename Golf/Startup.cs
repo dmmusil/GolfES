@@ -29,7 +29,8 @@ namespace Golf
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
-            services.AddSingleton<StreamStoreBase, InMemoryStreamStore>();
+            var settings = new MsSqlStreamStoreV3Settings(Configuration.GetConnectionString("EventStore"));
+            services.AddSingleton<StreamStoreBase>(o => new MsSqlStreamStoreV3(settings));
             services.AddSingleton<IJsonEventStore, SssEventStore>();
             services.AddSingleton(_ => JsonEventSerializer.Instance);
             services.AddSingleton<IAggregateStore, JsonAggregateStore>();

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.Json", "eventuous
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eventuous.SqlStreamStore", "eventuous\src\Eventuous.SqlStreamStore\Eventuous.SqlStreamStore.csproj", "{93CB1617-172C-4CBD-B747-DD71ECB0AADD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Golf.SSS.Schema", "Golf.SSS.Schema\Golf.SSS.Schema.csproj", "{F7CFF618-86AC-4E01-A546-CD96D5BCB6CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{93CB1617-172C-4CBD-B747-DD71ECB0AADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93CB1617-172C-4CBD-B747-DD71ECB0AADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93CB1617-172C-4CBD-B747-DD71ECB0AADD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7CFF618-86AC-4E01-A546-CD96D5BCB6CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7CFF618-86AC-4E01-A546-CD96D5BCB6CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7CFF618-86AC-4E01-A546-CD96D5BCB6CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7CFF618-86AC-4E01-A546-CD96D5BCB6CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
