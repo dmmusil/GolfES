@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Eventuous;
 
 namespace Golf.Data.Eventuous
@@ -16,8 +18,11 @@ namespace Golf.Data.Eventuous
 
     public class RoundService : ApplicationService<GolfRound, GolfRoundState, RoundId>
     {
+        private readonly IAggregateStore _store;
+
         public RoundService(IAggregateStore store) : base(store)
         {
+            _store = store;
             OnAny<SelectCourse>(
                 cmd => cmd.RoundId,
                 (round, select) => round.SelectCourse(select.RoundId, select.CourseId));
@@ -31,6 +36,11 @@ namespace Golf.Data.Eventuous
                 cmd => cmd.RoundId,
                 (round, hole) => round.SubmitHoleScore(hole.RoundId, hole.Score, hole.GolferId)
             );
+        }
+
+        public async Task<GolfRoundState> LoadState(string roundId)
+        {
+            return (await _store.Load<GolfRound>(roundId)).State;
         }
     }
 
@@ -46,13 +56,6 @@ namespace Golf.Data.Eventuous
             if (State.GolferIds.Contains(golferId)) return;
 
             Apply(new GolferSelected(roundId, golferId));
-
-            if (!generateScores) return;
-
-            for (var i = 0; i < 9; i++)
-            {
-                Apply(new HoleScoreSubmitted(roundId, golferId, i + 1, new Random().Next(2, 8)));
-            }
         }
 
         public void SubmitHoleScore(RoundId roundId, HoleScore score, GolferId golferId)
@@ -81,7 +84,7 @@ namespace Golf.Data.Eventuous
                 },
                 HoleScoreSubmitted h => this with
                 {
-                    Scores = Scores.Add((h.GolferId, h.HoleNumber), h.Strokes)
+                    Scores = AddScore(Scores, h)
                 },
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(@event), 
@@ -89,7 +92,18 @@ namespace Golf.Data.Eventuous
             };
        }
 
-        public ImmutableDictionary<(Guid golfer, int hole), int> Scores { get; init; } = ImmutableDictionary<(Guid golfer, int hole), int>.Empty;
+        private static Dictionary<Guid, Dictionary<int, int>> AddScore(Dictionary<Guid,Dictionary<int,int>> scores, HoleScoreSubmitted h)
+        {
+            if (!scores.TryGetValue(h.GolferId, out var holes))
+            {
+                holes = scores[h.GolferId] = new Dictionary<int, int>();
+            }
+            
+            holes[h.HoleNumber] = h.Strokes;
+            return scores;
+        }
+
+        public Dictionary<Guid, Dictionary<int, int>> Scores { get; init; } = new();
 
         public ImmutableHashSet<Guid> GolferIds { get; init; } = ImmutableHashSet<Guid>.Empty;
 

@@ -5,14 +5,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SqlStreamStore.MsSql" Version="1.2.0" />
+      <PackageReference Include="EventStore.Client" Version="21.2.0" />
+      <PackageReference Include="Eventuous.EventStoreDB" Version="0.1.1" />
+      <PackageReference Include="Eventuous.Projections.MongoDB" Version="0.1.1" />
       <PackageReference Include="ValueOf" Version="1.0.17" />
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\eventuous\src\Eventuous.Json\Eventuous.Json.csproj" />
-      <ProjectReference Include="..\eventuous\src\Eventuous.SqlStreamStore\Eventuous.SqlStreamStore.csproj" />
-      <ProjectReference Include="..\eventuous\src\Eventuous\Eventuous.csproj" />
-    </ItemGroup>
-
 </Project>

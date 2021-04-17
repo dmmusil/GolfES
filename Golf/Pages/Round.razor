@@ -1,0 +1,68 @@
+@page "/counter/{id}"
+@using Golf.Data
+@inject IRoundViewModel RoundViewModel
+
+@if (RoundViewModel.Round == null)
+{
+    <select @bind="RoundViewModel.SelectedCourse">
+        <option value="@Guid.Empty">Choose a course</option>
+        @foreach (var (name, id) in Course.Courses)
+        {
+            <option value="@id">@name</option>
+        }
+    </select>
+    <button @onclick="() => RoundViewModel.CreateRound(Id)">New round</button>
+}
+
+@if (RoundViewModel.Round != null)
+{
+    <div>
+        @RoundViewModel.SelectedCourseName
+    </div>
+    <button @onclick="RoundViewModel.SelectGolfer">
+        Add player
+    </button>
+
+    <table>
+        <thead>
+        <tr>
+            <th width="100px">Hole</th>
+            @for (var i = 1; i <= 18; i++)
+            {
+                <th width="25px">@i</th>
+            }
+            <th>Total</th>
+        </tr>
+        <tr>
+            <th>Par</th>
+            @for (var i = 1; i <= 18; i++)
+            {
+                <th>4</th>
+            }
+            <th>72</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Dylan</td>
+            @foreach (var kvp in RoundViewModel.Round.Scores.Values.First())
+            {
+                <td>@kvp.Value</td>
+            }
+        </tr>
+        </tbody>
+    </table>
+    <p>@RoundViewModel.Strokes</p>
+    <button @onclick="RoundViewModel.Refresh">Refresh</button>
+}
+
+@code
+{
+    [Parameter]
+    public string Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RoundViewModel.Load(Id);
+    }
+}
