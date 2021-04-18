@@ -43,13 +43,16 @@
         </tr>
         </thead>
         <tbody>
+        @foreach (var player in RoundViewModel.Players)
+        {
         <tr>
-            <td>Dylan</td>
-            @foreach (var kvp in RoundViewModel.Round.Scores.Values.First())
+            <td>@player.ToString("N")[..5]</td>
+            @foreach (var kvp in RoundViewModel.Round.Scores[player])
             {
                 <td>@kvp.Value</td>
             }
         </tr>
+        }
         </tbody>
     </table>
     <p>@RoundViewModel.Strokes</p>
@@ -66,3 +69,4 @@
         await RoundViewModel.Load(Id);
     }
 }
+

@@ -12,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Golf.Data;
-using Golf.Data.Eventuous;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using UserCredentials = EventStore.Client.UserCredentials;
